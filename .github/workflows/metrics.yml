@@ -52,6 +52,7 @@ jobs:
           plugin_languages_skipped: |
             @use.patterns
             -aardbol/portfolio
+            -aardbol/secretshareweb
           plugin_languages_sections: most-used
           plugin_languages_details: percentage
           plugin_languages_limit: 8
