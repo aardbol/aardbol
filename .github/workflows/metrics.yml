@@ -1,0 +1,64 @@
+name: Profile cards
+
+on:
+  schedule:
+    - cron: "37 3 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/metrics.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: profile-cards
+  cancel-in-progress: true
+
+jobs:
+  cards:
+    runs-on: ubuntu-latest
+    steps:
+      # Stars, forks, repos, followers, joined date and lines changed.
+      - name: At a glance
+        uses: lowlighter/metrics@latest
+        with:
+          filename: at-a-glance.svg
+          token: ${{ secrets.METRICS_TOKEN || github.token }}
+          user: aardbol
+          template: classic
+          base: header, activity, community, repositories, metadata
+          config_display: large
+          config_timezone: Europe/Madrid
+
+      # Full commit calendar, one row per year since account registration.
+      - name: Contributions per year
+        uses: lowlighter/metrics@latest
+        with:
+          filename: contributions-per-year.svg
+          token: ${{ secrets.METRICS_TOKEN || github.token }}
+          user: aardbol
+          template: classic
+          base: ""
+          config_display: large
+          config_timezone: Europe/Madrid
+          plugin_calendar: yes
+          plugin_calendar_limit: 0
+
+      # Most used languages across repositories, with percentage details.
+      - name: Languages
+        uses: lowlighter/metrics@latest
+        with:
+          filename: languages.svg
+          token: ${{ secrets.METRICS_TOKEN || github.token }}
+          user: aardbol
+          template: classic
+          base: ""
+          config_display: large
+          config_timezone: Europe/Madrid
+          plugin_languages: yes
+          plugin_languages_sections: most-used
+          plugin_languages_details: percentage
+          plugin_languages_limit: 8
+          plugin_languages_other: yes
