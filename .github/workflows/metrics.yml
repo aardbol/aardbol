@@ -48,9 +48,8 @@ jobs:
           plugin_notable_from: all
           plugin_notable_types: commit, pull_request, issue
           plugin_notable_repositories: yes
-          # Only projects with real traction, and show per-repo stats on each chip.
+          # Only projects with real traction.
           plugin_notable_filter: "stars:>=100"
-          plugin_notable_indepth: yes
 
       # Most used languages across repositories, with percentage details.
       - name: Languages
