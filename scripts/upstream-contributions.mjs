@@ -66,6 +66,7 @@ async function pulls() {
         pageInfo { hasNextPage endCursor }
         nodes {
           createdAt
+          commits(first: 1) { totalCount }
           repository {
             nameWithOwner
             stargazerCount
@@ -108,6 +109,7 @@ async function collect() {
         stars: repository.stargazerCount,
         avatar: repository.owner.avatarUrl,
         commits: 0,
+        prCommits: 0,
         prs: 0,
         first: Infinity,
         last: -Infinity,
@@ -131,15 +133,22 @@ async function collect() {
     }
   }
 
-  for (const {createdAt, repository} of await pulls()) {
+  for (const {createdAt, commits: {totalCount}, repository} of await pulls()) {
     if (!upstream(repository))
       continue
     const project = entry(repository)
     const contributorYear = new Date(createdAt).getUTCFullYear()
     project.prs++
+    project.prCommits += totalCount
     project.first = Math.min(project.first, contributorYear)
     project.last = Math.max(project.last, contributorYear)
   }
+
+  // Authored commits on the default branch miss squashed pull requests (the squashed
+  // commit belongs to whoever merged it) and commits made with an unlinked email.
+  // Commits inside your merged PRs cover both, so keep whichever number is larger.
+  for (const project of projects.values())
+    project.commits = Math.max(project.commits, project.prCommits)
 
   const all = [...projects.values()].filter(({commits, prs}) => commits + prs > 0)
   return {
