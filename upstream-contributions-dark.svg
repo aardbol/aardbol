@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="412" viewBox="0 0 960 412" role="img" aria-labelledby="title desc" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+  <title id="title">Upstream contributions</title>
+  <desc id="desc">43 merged pull requests across 18 projects</desc>
+  <text x="0" y="22" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="16" font-weight="600" fill="#c9d1d9">Upstream contributions</text>
+  <text x="0" y="44" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8b949e">43 merged pull requests across 18 projects</text>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">
+    <text x="0" y="72" font-size="10" letter-spacing="1" fill="#8b949e">PROJECT</text>
+    <text x="800" y="72" text-anchor="end" font-size="10" letter-spacing="1" fill="#8b949e">STARS</text>
+    <text x="952" y="72" text-anchor="end" font-size="10" letter-spacing="1" fill="#8b949e">MERGED PRS</text>
+    <line x1="0" y1="80" x2="952" y2="80" stroke="#30363d" stroke-width="1"/></g>
+    <text x="0" y="109" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">paritytech/substrate</text>
+    <text x="800" y="109" text-anchor="end" font-size="12.5" fill="#8b949e">8.4k</text>
+    <text x="952" y="109" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="118" x2="952" y2="118" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="135" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">kubernetes-sigs/karpenter</text>
+    <text x="800" y="135" text-anchor="end" font-size="12.5" fill="#8b949e">2.3k</text>
+    <text x="952" y="135" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="144" x2="952" y2="144" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="161" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">ansible-collections/community.general</text>
+    <text x="800" y="161" text-anchor="end" font-size="12.5" fill="#8b949e">1.1k</text>
+    <text x="952" y="161" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="170" x2="952" y2="170" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="187" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">moneymanagerex/android-money-manager-ex</text>
+    <text x="800" y="187" text-anchor="end" font-size="12.5" fill="#8b949e">721</text>
+    <text x="952" y="187" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="196" x2="952" y2="196" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="213" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">zachflower/awesome-open-source-supporters</text>
+    <text x="800" y="213" text-anchor="end" font-size="12.5" fill="#8b949e">701</text>
+    <text x="952" y="213" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="222" x2="952" y2="222" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="239" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">Antergos/Cnchi</text>
+    <text x="800" y="239" text-anchor="end" font-size="12.5" fill="#8b949e">288</text>
+    <text x="952" y="239" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="248" x2="952" y2="248" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="265" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">grafana/grafana-ansible-collection</text>
+    <text x="800" y="265" text-anchor="end" font-size="12.5" fill="#8b949e">243</text>
+    <text x="952" y="265" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="274" x2="952" y2="274" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="291" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">liamja/Prebake</text>
+    <text x="800" y="291" text-anchor="end" font-size="12.5" fill="#8b949e">214</text>
+    <text x="952" y="291" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">9</text>
+    <line x1="0" y1="300" x2="952" y2="300" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="317" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">ipr-cnrs/nftables</text>
+    <text x="800" y="317" text-anchor="end" font-size="12.5" fill="#8b949e">189</text>
+    <text x="952" y="317" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="326" x2="952" y2="326" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="343" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">pulumi/docs</text>
+    <text x="800" y="343" text-anchor="end" font-size="12.5" fill="#8b949e">180</text>
+    <text x="952" y="343" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="352" x2="952" y2="352" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="369" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">scaleway/docs-content</text>
+    <text x="800" y="369" text-anchor="end" font-size="12.5" fill="#8b949e">98</text>
+    <text x="952" y="369" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="378" x2="952" y2="378" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+    <text x="0" y="395" font-family="SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace" font-size="12.5" fill="#c9d1d9">cert-manager/website</text>
+    <text x="800" y="395" text-anchor="end" font-size="12.5" fill="#8b949e">67</text>
+    <text x="952" y="395" text-anchor="end" font-size="12.5" fill="#58a6ff" font-weight="600">1</text>
+    <line x1="0" y1="404" x2="952" y2="404" stroke="#30363d" stroke-width="1" opacity="0.6"/>
+</svg>

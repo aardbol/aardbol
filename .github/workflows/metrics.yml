@@ -8,6 +8,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/metrics.yml
+      - scripts/**
 
 permissions:
   contents: write
@@ -20,7 +21,7 @@ jobs:
   cards:
     runs-on: ubuntu-latest
     steps:
-      # Stars, forks, repos, followers, joined date and lines changed.
+      # Stars, repos, followers, contribution activity and joined date.
       - name: At a glance
         uses: lowlighter/metrics@latest
         with:
@@ -31,25 +32,6 @@ jobs:
           base: header, activity, community, repositories, metadata
           config_display: large
           config_timezone: Europe/Madrid
-
-      
-      # Repositories you contributed to upstream (not your own), ranked by traction.
-      - name: Upstream contributions
-        uses: lowlighter/metrics@latest
-        with:
-          filename: upstream-contributions.svg
-          token: ${{ secrets.METRICS_TOKEN || github.token }}
-          user: aardbol
-          template: classic
-          base: ""
-          config_display: large
-          config_timezone: Europe/Madrid
-          plugin_notable: yes
-          plugin_notable_from: all
-          plugin_notable_types: commit, pull_request, issue
-          plugin_notable_repositories: yes
-          # Only projects with real traction.
-          plugin_notable_filter: "stars:>=100"
 
       # Most used languages across repositories, with percentage details.
       - name: Languages
@@ -67,3 +49,25 @@ jobs:
           plugin_languages_sections: most-used
           plugin_languages_details: percentage
           plugin_languages_limit: 8
+
+      # Merged pull requests in projects you do not administer, rendered as a table.
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Render upstream contributions
+        run: node scripts/upstream-contributions.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          GITHUB_LOGIN: aardbol
+
+      - name: Commit cards
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add upstream-contributions.svg upstream-contributions-dark.svg
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "[skip ci] Update upstream contributions card"
+            git push
+          fi

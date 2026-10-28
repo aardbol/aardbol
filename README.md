@@ -4,7 +4,10 @@
 
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions.svg" alt="Upstream contributions" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions-dark.svg">
+    <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions.svg" alt="Upstream contributions: merged pull requests per project" width="100%">
+  </picture>
 </p>
 
 <p align="center">
