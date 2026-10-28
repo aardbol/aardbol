@@ -7,5 +7,9 @@
 </p>
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions.svg" alt="Upstream contributions" width="100%">
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/languages.svg" alt="Most used languages" width="100%">
 </p>

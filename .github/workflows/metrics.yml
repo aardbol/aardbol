@@ -46,6 +46,22 @@ jobs:
           plugin_calendar: yes
           plugin_calendar_limit: 0
 
+      # Repositories you contributed to upstream (not your own), ranked by traction.
+      - name: Upstream contributions
+        uses: lowlighter/metrics@latest
+        with:
+          filename: upstream-contributions.svg
+          token: ${{ secrets.METRICS_TOKEN || github.token }}
+          user: aardbol
+          template: classic
+          base: ""
+          config_display: large
+          config_timezone: Europe/Madrid
+          plugin_notable: yes
+          plugin_notable_from: all
+          plugin_notable_types: commit, pull_request, issue
+          plugin_notable_repositories: yes
+
       # Most used languages across repositories, with percentage details.
       - name: Languages
         uses: lowlighter/metrics@latest
