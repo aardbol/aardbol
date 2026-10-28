@@ -32,20 +32,7 @@ jobs:
           config_display: large
           config_timezone: Europe/Madrid
 
-      # Full commit calendar, one row per year since account registration.
-      - name: Contributions per year
-        uses: lowlighter/metrics@latest
-        with:
-          filename: contributions-per-year.svg
-          token: ${{ secrets.METRICS_TOKEN || github.token }}
-          user: aardbol
-          template: classic
-          base: ""
-          config_display: large
-          config_timezone: Europe/Madrid
-          plugin_calendar: yes
-          plugin_calendar_limit: 0
-
+      
       # Repositories you contributed to upstream (not your own), ranked by traction.
       - name: Upstream contributions
         uses: lowlighter/metrics@latest
