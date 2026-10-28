@@ -19,11 +19,11 @@ concurrency:
 
 jobs:
   cards:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # Stars, repos, followers, contribution activity and joined date.
       - name: At a glance
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6 # v3.34
         with:
           filename: at-a-glance.svg
           token: ${{ secrets.METRICS_TOKEN || github.token }}
@@ -35,7 +35,7 @@ jobs:
 
       # Most used languages across repositories, with percentage details.
       - name: Languages
-        uses: lowlighter/metrics@latest
+        uses: lowlighter/metrics@65836723097537a54cd8eb90f61839426b4266b6 # v3.34
         with:
           filename: languages.svg
           token: ${{ secrets.METRICS_TOKEN || github.token }}
@@ -52,7 +52,7 @@ jobs:
 
       # Merged pull requests in projects you do not administer, rendered as a table.
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
 
       - name: Render upstream contributions
         run: node scripts/upstream-contributions.mjs
