@@ -6,7 +6,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions-dark.svg">
-    <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions.svg" alt="Upstream contributions: commits per project" width="100%">
+    <img src="https://raw.githubusercontent.com/aardbol/aardbol/main/upstream-contributions.svg" alt="Upstream contributions: commits and merged pull requests per project" width="100%">
   </picture>
 </p>
 

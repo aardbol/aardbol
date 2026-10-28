@@ -1,5 +1,6 @@
-// Renders the "Upstream contributions" card: commits you authored in projects
-// you do not control, in a two-column grid ranked by the project's stars.
+// Renders the "Upstream contributions" card: commits and merged pull requests
+// you authored in projects you do not control, in a two-column grid ranked by
+// the project's stars.
 //
 // Usage: GITHUB_TOKEN=... GITHUB_LOGIN=your-login node scripts/upstream-contributions.mjs
 
@@ -57,40 +58,95 @@ async function year(from, to) {
   return user.contributionsCollection.commitContributionsByRepository
 }
 
-/** Walk every year since the account was created and merge the results */
+/** Every merged pull request authored by the user */
+async function pulls() {
+  const query = `query ($login: String!, $after: String) {
+    user(login: $login) {
+      pullRequests(first: 100, after: $after, states: MERGED) {
+        pageInfo { hasNextPage endCursor }
+        nodes {
+          createdAt
+          repository {
+            nameWithOwner
+            stargazerCount
+            viewerPermission
+            owner { login avatarUrl }
+          }
+        }
+      }
+    }
+  }`
+
+  const nodes = []
+  let after = null
+  do {
+    const {user} = await graphql(query, {login: LOGIN, after})
+    nodes.push(...user.pullRequests.nodes)
+    after = user.pullRequests.pageInfo.hasNextPage ? user.pullRequests.pageInfo.endCursor : null
+  } while (after)
+  return nodes
+}
+
+/** True when a repository does not belong to the user or an org they administer */
+function upstream(repository) {
+  if (!repository)
+    return false
+  return INCLUDE_OWN || (repository.owner.login !== LOGIN && repository.viewerPermission !== "ADMIN")
+}
+
+/** Walk every year since the account was created and merge commits with merged pull requests */
 async function collect() {
   const {user} = await graphql(`query ($login: String!) { user(login: $login) { createdAt } }`, {login: LOGIN})
   const firstYear = Number(process.env.UPSTREAM_SINCE ?? new Date(user.createdAt).getUTCFullYear())
   const currentYear = new Date().getUTCFullYear()
 
   const projects = new Map()
-  for (let current = firstYear; current <= currentYear; current++) {
-    const from = `${current}-01-01T00:00:00Z`
-    const to = current === currentYear ? new Date().toISOString() : `${current}-12-31T23:59:59Z`
-    for (const {contributions: {totalCount}, repository} of await year(from, to)) {
-      // Own account and repositories you administer are not "upstream"
-      if (!repository)
-        continue
-      if (!INCLUDE_OWN && (repository.owner.login === LOGIN || repository.viewerPermission === "ADMIN"))
-        continue
-      const entry = projects.get(repository.nameWithOwner) ?? {
+  const entry = repository => {
+    if (!projects.has(repository.nameWithOwner)) {
+      projects.set(repository.nameWithOwner, {
         repo: repository.nameWithOwner,
         stars: repository.stargazerCount,
         avatar: repository.owner.avatarUrl,
         commits: 0,
-        first: current,
-        last: current,
-      }
-      entry.commits += totalCount
-      entry.stars = repository.stargazerCount
-      entry.first = Math.min(entry.first, current)
-      entry.last = Math.max(entry.last, current)
-      projects.set(entry.repo, entry)
+        prs: 0,
+        first: Infinity,
+        last: -Infinity,
+      })
+    }
+    const project = projects.get(repository.nameWithOwner)
+    project.stars = repository.stargazerCount
+    return project
+  }
+
+  for (let current = firstYear; current <= currentYear; current++) {
+    const from = `${current}-01-01T00:00:00Z`
+    const to = current === currentYear ? new Date().toISOString() : `${current}-12-31T23:59:59Z`
+    for (const {contributions: {totalCount}, repository} of await year(from, to)) {
+      if (!upstream(repository))
+        continue
+      const project = entry(repository)
+      project.commits += totalCount
+      project.first = Math.min(project.first, current)
+      project.last = Math.max(project.last, current)
     }
   }
 
-  const all = [...projects.values()].filter(({commits}) => commits > 0)
-  return {total: all.reduce((sum, {commits}) => sum + commits, 0), projects: all}
+  for (const {createdAt, repository} of await pulls()) {
+    if (!upstream(repository))
+      continue
+    const project = entry(repository)
+    const contributorYear = new Date(createdAt).getUTCFullYear()
+    project.prs++
+    project.first = Math.min(project.first, contributorYear)
+    project.last = Math.max(project.last, contributorYear)
+  }
+
+  const all = [...projects.values()].filter(({commits, prs}) => commits + prs > 0)
+  return {
+    commits: all.reduce((sum, {commits}) => sum + commits, 0),
+    prs: all.reduce((sum, {prs}) => sum + prs, 0),
+    projects: all,
+  }
 }
 
 /** Downscale the owner avatar and inline it, so the card stays self-contained */
@@ -112,9 +168,13 @@ function stars(n) {
   return `${(n / 1000).toFixed(n < 10000 ? 1 : 0)}k`
 }
 
-/** Rough rendered width of short numerals, good enough for icon placement */
+/** Rough rendered width of short labels, good enough for icon placement */
 function width(text, size = 12) {
   return [...text].reduce((sum, char) => sum + (/[0-9]/.test(char) ? 0.6 : 0.5) * size, 0)
+}
+
+function plural(count, word) {
+  return `${count} ${word}${count === 1 ? "" : "s"}`
 }
 
 function escapeXml(text) {
@@ -128,10 +188,17 @@ const THEMES = {
 
 const STAR_PATH = "M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"
 const COMMIT_PATH = "M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z"
+const PULL_PATH = "M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"
 const BRANCH_PATH = "M9.5 3.25a2.25 2.25 0 1 1 3 2.122V6A2.5 2.5 0 0 1 10 8.5H6a1 1 0 0 0-1 1v1.128a2.251 2.251 0 1 1-1.5 0V5.372a2.25 2.25 0 1 1 1.5 0v1.836A2.493 2.493 0 0 1 6 7h4a1 1 0 0 0 1-1v-.628A2.25 2.25 0 0 1 9.5 3.25Zm-6 0a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Zm8.25-.75a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5ZM4.25 12a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Z"
 
+/** Stat pair: icon + label, laid out left to right from a cursor */
+function stat(x, y, {path, color, label, text}) {
+  return `<svg x="${x}" y="${y}" width="12" height="12" viewBox="0 0 16 16"><path fill="${color}" d="${path}"/></svg>` +
+    `<text x="${x + 16}" y="${y + 10}" font-size="12" fill="${text}">${label}</text>`
+}
+
 /** Render one colour scheme */
-function render({total, projects, theme}) {
+function render({commits, prs, total, projects, theme}) {
   const color = THEMES[theme]
   const font = `-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif`
   const mono = `ui-monospace,SFMono-Regular,Menlo,monospace`
@@ -145,15 +212,29 @@ function render({total, projects, theme}) {
   const rows = Math.ceil(projects.length / columns)
   const height = rows ? top + rows * (rowHeight + gapY) - gapY + 24 : top + 52
 
-  const cards = projects.map(({repo, stars: count, commits, first, last, avatar: image}, index) => {
+  const cards = projects.map((project, index) => {
     const column = index % columns
     const line = Math.floor(index / columns)
     const x = 24 + column * (rowWidth + gapX)
     const y = top + line * (rowHeight + gapY)
-    const [owner, name] = repo.split("/")
-    const years = first === last ? `${first}` : `${first}–${last}`
-    const starText = stars(count)
-    const commitIconX = 48 + 13 + width(starText) + 13
+    const [owner, name] = project.repo.split("/")
+    const years = project.first === project.last ? `${project.first}` : `${project.first}–${project.last}`
+    const image = project.avatar
+
+    // Stats line: stars, merged PRs, commits, in that order
+    const stats = [{path: STAR_PATH, color: color.star, label: stars(project.stars), text: color.muted}]
+    if (project.prs)
+      stats.push({path: PULL_PATH, color: color.accent, label: plural(project.prs, "PR"), text: color.muted})
+    if (project.commits)
+      stats.push({path: COMMIT_PATH, color: color.muted, label: plural(project.commits, "commit"), text: color.muted})
+
+    let offset = x + 48
+    const statsMarkup = stats.map(stat_ => {
+      const markup = stat(offset, y + 28, stat_)
+      offset += 16 + width(stat_.label) + 12
+      return markup
+    }).join("")
+
     return `
     <g>
       <rect x="${x}" y="${y}" width="${rowWidth}" height="${rowHeight}" rx="8" fill="${color.row}" stroke="${color.line}"/>
@@ -161,16 +242,13 @@ function render({total, projects, theme}) {
       <circle cx="${x + 24}" cy="${y + 26}" r="13.5" fill="none" stroke="${color.line}"/>
       <text x="${x + 48}" y="${y + 20}" font-size="13" fill="${color.muted}">${escapeXml(owner)}/<tspan font-weight="600" fill="${color.fg}">${escapeXml(name)}</tspan></text>
       <text x="${x + 378}" y="${y + 20}" text-anchor="end" font-size="11" font-family="${mono}" fill="${color.muted}">${years}</text>
-      <svg x="${x + 48}" y="${y + 28}" width="12" height="12" viewBox="0 0 16 16"><path fill="${color.star}" d="${STAR_PATH}"/></svg>
-      <text x="${x + 64}" y="${y + 38}" font-size="12" fill="${color.muted}">${starText}</text>
-      <svg x="${x + commitIconX}" y="${y + 28}" width="12" height="12" viewBox="0 0 16 16"><path fill="${color.muted}" d="${COMMIT_PATH}"/></svg>
-      <text x="${x + commitIconX + 16}" y="${y + 38}" font-size="12" fill="${color.muted}">${commits} commit${commits === 1 ? "" : "s"}</text>
+      ${statsMarkup}
     </g>`
   }).join("")
 
   const summary = projects.length
-    ? `${total} commits across ${projects.length} project${projects.length === 1 ? "" : "s"}`
-    : "No commits outside your own repositories yet"
+    ? `${plural(prs, "merged PR")} and ${plural(commits, "commit")} across ${plural(total, "project")}`
+    : "No contributions outside your own repositories yet"
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="840" height="${height}" viewBox="0 0 840 ${height}" fill="none" role="img" aria-labelledby="title desc" font-family="${font}">
   <title id="title">Upstream contributions</title>
@@ -185,7 +263,9 @@ function render({total, projects, theme}) {
 
 const data = await collect()
 const ranked = {
-  total: data.total,
+  commits: data.commits,
+  prs: data.prs,
+  total: data.projects.length,
   projects: data.projects.sort((a, b) => b.stars - a.stars || b.commits - a.commits).slice(0, LIMIT),
 }
 
@@ -196,4 +276,4 @@ await Promise.all(ranked.projects.map(async project => {
 for (const theme of ["light", "dark"])
   await writeFile(FILES[theme], render({...ranked, theme}))
 
-console.log(`upstream: ${data.total} commits across ${data.projects.length} projects, card shows ${ranked.projects.length}`)
+console.log(`upstream: ${data.prs} merged PRs and ${data.commits} commits across ${data.projects.length} projects, card shows ${ranked.projects.length}`)
