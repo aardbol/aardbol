@@ -75,5 +75,14 @@ jobs:
             echo "No changes to commit"
           else
             git commit -m "[skip ci] Update upstream contributions card"
-            git push
+            # metrics pushes its SVGs to main mid-run while this checkout is
+            # pinned to the run-start commit, so rebase over them before pushing.
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push; then
+                exit 0
+              fi
+              sleep $((attempt * 3))
+            done
+            echo "::error::Could not push the upstream card after 3 attempts"
+            exit 1
           fi
